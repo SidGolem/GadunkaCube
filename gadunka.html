@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Page Website Demo</title>
+    <title>Gadunka Cube</title>
     <style>
         * {
             margin: 0;
@@ -65,6 +65,13 @@
         .nav-btn.active {
             background: linear-gradient(45deg, #2ecc71, #27ae60);
             transform: scale(1.05);
+        }
+
+        .nav-btn.image-btn {
+            background-image: 
+            linear-gradient(rgba(255, 107, 107, 0.9), rgba(238, 90, 36, 0.9)),
+            url('background-image-url');
+            background-size: cover;
         }
 
         /* Page Content Styles */
@@ -242,62 +249,70 @@
         <!-- Navigation -->
         <nav>
             <div class="nav-buttons">
-                <button class="nav-btn active" data-page="home">🏠 Home</button>
-                <button class="nav-btn" data-page="about">👤 About</button>
-                <button class="nav-btn" data-page="services">⚙️ Services</button>
-                <button class="nav-btn" data-page="portfolio">💼 Portfolio</button>
-                <button class="nav-btn" data-page="contact">📧 Contact</button>
+                <button class="nav-btn active" data-page="Home">Home</button>
+                <button class="nav-btn" data-page="Players">Players</button>
+                <button class="nav-btn" data-page="Stats">Stats</button>
+                <button class="nav-btn" data-page="Enter Data">Enter Data</button>
             </div>
         </nav>
 
         <!-- Home Page -->
-        <div class="page active" id="home">
-            <h1>Welcome to Our Website</h1>
-            <p>This is a demonstration of how to create multiple pages within a single HTML file using JavaScript for navigation.</p>
-            
-            <div class="action-buttons">
-                <button class="action-btn" onclick="showPage('about')">Learn About Us</button>
-                <button class="action-btn secondary" onclick="showPage('services')">View Services</button>
-                <button class="action-btn success" onclick="showPage('contact')">Get Started</button>
-            </div>
+        <div class="page active" id="Home">
+            <h1>Gadunka Cube Headquarters</h1>
+            <p>Cube Cobra pages</p>
+            <p>Gadunka Cube: </p>
+            <p>Tomo Cube: </p>
 
             <div class="cards-container">
-                <div class="card">
-                    <h3>🚀 Fast</h3>
-                    <p>Lightning-fast performance with modern web technologies</p>
-                </div>
-                <div class="card">
-                    <h3>📱 Responsive</h3>
-                    <p>Works perfectly on all devices and screen sizes</p>
-                </div>
-                <div class="card">
-                    <h3>🎨 Beautiful</h3>
-                    <p>Modern design with smooth animations and effects</p>
-                </div>
+              <div class="card">
+                <h3>Reigning Champion</h3>
+                <p>Player Name</p>
+              </div>
+              <div class="card">
+                  <h3>Deck:</h3>
+                  <p>Insert deck stats</p>
+                  <div style="margin-top: 15px;">
+                      <button class="action-btn" onclick="alert('Deck-List selected!')">View List</button>
+                  </div>
+              </div>
             </div>
+
         </div>
 
-        <!-- About Page -->
-        <div class="page" id="about">
-            <h1>About Us</h1>
-            <h2>Our Story</h2>
-            <p>We are a team of passionate developers creating amazing web experiences. Our mission is to build beautiful, functional websites that help businesses grow.</p>
-            
-            <h2>Our Values</h2>
-            <p>Quality, innovation, and customer satisfaction are at the heart of everything we do.</p>
+        <!-- Players Page -->
+        <div class="page" id="Players">
+            <h1>Players</h1>
+            <h2>Cube player profiles</h2>
+            <p> </p>
 
+            <div class="cards-container">
+              <div class="card">
+                <h3>Player Profile format</h3>
+                <p>Player Name</p>
+                <ul>
+                  <li>Wins: </li>
+                  <li>Favorite Color: </li>
+                  <li>Most used combo: </li>
+                  <li></li>
+                </ul>
+              </div>
+            </div>
+            
             <div class="action-buttons">
-                <button class="action-btn" onclick="showPage('portfolio')">View Our Work</button>
+                <button class="action-btn" onclick="showPage('Stats')">Search Stats Database</button>
                 <button class="action-btn secondary" onclick="showPage('home')">Back to Home</button>
             </div>
         </div>
 
-        <!-- Services Page -->
-        <div class="page" id="services">
-            <h1>Our Services</h1>
-            <h2>What We Offer</h2>
-            <p>We provide comprehensive web development solutions tailored to your needs.</p>
-
+        <!-- Stats Page -->
+        <div class="page" id="Stats">
+            <h1>Cube Stats</h1>
+            <h2>S</h2>
+            <p></p>
+            <!-- Add search functionality -->
+            <input type="text" id="search-input" placeholder="Search...">
+            <div id="search-results"></div>
+            
             <div class="cards-container">
                 <div class="card">
                     <h3>Web Development</h3>
@@ -328,41 +343,14 @@
             </div>
         </div>
 
-        <!-- Portfolio Page -->
-        <div class="page" id="portfolio">
-            <h1>Our Portfolio</h1>
-            <p>Take a look at some of our recent projects and success stories.</p>
-
-            <div class="cards-container">
-                <div class="card">
-                    <h3>Project Alpha</h3>
-                    <p>E-commerce platform with advanced features</p>
-                </div>
-                <div class="card">
-                    <h3>Project Beta</h3>
-                    <p>Mobile-first responsive website</p>
-                </div>
-                <div class="card">
-                    <h3>Project Gamma</h3>
-                    <p>Custom web application with database integration</p>
-                </div>
-            </div>
-
-            <div class="action-buttons">
-                <button class="action-btn" onclick="alert('Portfolio item clicked!')">View Details</button>
-                <button class="action-btn secondary" onclick="showPage('contact')">Hire Us</button>
-                <button class="action-btn secondary" onclick="showPage('home')">Back to Home</button>
-            </div>
-        </div>
-
-        <!-- Contact Page -->
-        <div class="page" id="contact">
-            <h1>Contact Us</h1>
-            <p>Ready to start your project? Get in touch with us today!</p>
+        <!-- Data Entry Page -->
+        <div class="page" id="Enter Data">
+            <h1>Enter Game results here</h1>
+            <p></p>
 
             <form onsubmit="handleFormSubmit(event)">
                 <div class="form-group">
-                    <label for="name">Full Name</label>
+                    <label for="Victor username"></label>
                     <input type="text" id="name" name="name" required>
                 </div>
 
@@ -374,7 +362,7 @@
                 <div class="form-group">
                     <label for="service">Service Needed</label>
                     <select id="service" name="service" required>
-                        <option value="">Select a service</option>
+                        <option value=""></option>
                         <option value="web-dev">Web Development</option>
                         <option value="ecommerce">E-commerce</option>
                         <option value="mobile">Mobile App</option>
@@ -443,22 +431,307 @@
             document.querySelector('form').reset();
         }
 
-        // Keyboard navigation
-        document.addEventListener('keydown', function(e) {
-            if (e.altKey) {
-                switch(e.key) {
-                    case '1': showPage('home'); break;
-                    case '2': showPage('about'); break;
-                    case '3': showPage('services'); break;
-                    case '4': showPage('portfolio'); break;
-                    case '5': showPage('contact'); break;
-                }
-            }
-        });
-
         // Initialize page
         console.log('Multi-page website loaded successfully!');
         console.log('Use Alt+1-5 for keyboard navigation');
+
+        // frontend-db.js
+
+        // Configuration
+        const API_BASE_URL = 'http://localhost:8000/api';
+
+        // Utility function to make API calls
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('API call failed:', error);
+                throw error;
+            }
+        }
+
+        // Load services from database and display them
+        async function loadStats() {
+            try {
+                const services = await apiCall('/stats');
+                displayServices(services);
+            } catch (error) {
+                console.error('Error loading services:', error);
+                displayError('Failed to load services. Please try again later.');
+            }
+        }
+
+        // Display services in the UI
+        function displayServices(services) {
+            const servicesContainer = document.getElementById('services-container');
+            if (!servicesContainer) return;
+            
+            servicesContainer.innerHTML = '';
+            
+            services.forEach(service => {
+                const serviceCard = document.createElement('div');
+                serviceCard.className = 'card';
+                serviceCard.innerHTML = `
+                    <h3>${service.title}</h3>
+                    <p>${service.description}</p>
+                    <p class="price">$${service.price}</p>
+                    ${service.image_url ? `<img src="${service.image_url}" alt="${service.title}" style="max-width: 100%; border-radius: 8px;">` : ''}
+                    <div style="margin-top: 15px;">
+                        <button class="action-btn" onclick="selectService('${service.title}')">Select Service</button>
+                    </div>
+                `;
+                servicesContainer.appendChild(serviceCard);
+            });
+        }
+
+        // Load portfolio projects from database
+        async function loadProjects() {
+            try {
+                const projects = await apiCall('/projects');
+                displayProjects(projects);
+            } catch (error) {
+                console.error('Error loading projects:', error);
+                displayError('Failed to load portfolio. Please try again later.');
+            }
+        }
+
+        // Display projects in the UI
+        function displayProjects(projects) {
+            const projectsContainer = document.getElementById('projects-container');
+            if (!projectsContainer) return;
+            
+            projectsContainer.innerHTML = '';
+            
+            projects.forEach(project => {
+                const projectCard = document.createElement('div');
+                projectCard.className = 'card';
+                projectCard.innerHTML = `
+                    <h3>${project.name}</h3>
+                    <p>${project.description}</p>
+                    <p><strong>Technology:</strong> ${project.technology}</p>
+                    ${project.image_url ? `<img src="${project.image_url}" alt="${project.name}" style="max-width: 100%; border-radius: 8px; margin: 10px 0;">` : ''}
+                    ${project.project_url ? `<a href="${project.project_url}" target="_blank" class="action-btn" style="display: inline-block; text-decoration: none; margin-top: 10px;">View Project</a>` : ''}
+                `;
+                projectsContainer.appendChild(projectCard);
+            });
+        }
+
+        // Submit contact form to database
+        async function submitContactForm(formData) {
+            try {
+                const result = await apiCall('/contact', {
+                    method: 'POST',
+                    body: JSON.stringify(formData)
+                });
+                
+                alert('Thank you for your message! We\'ll get back to you soon.');
+                document.querySelector('#contact form').reset();
+                return result;
+            } catch (error) {
+                console.error('Error submitting contact form:', error);
+                alert('Failed to send message. Please try again later.');
+                throw error;
+            }
+        }
+
+        // Search functionality
+        async function searchContent(query) {
+            if (!query.trim()) return;
+            
+            try {
+                const results = await apiCall(`/search?q=${encodeURIComponent(query)}`);
+                displaySearchResults(results);
+            } catch (error) {
+                console.error('Error searching:', error);
+                displayError('Search failed. Please try again.');
+            }
+        }
+
+        // Display search results
+        function displaySearchResults(results) {
+            const searchContainer = document.getElementById('search-results');
+            if (!searchContainer) return;
+            
+            searchContainer.innerHTML = '';
+            
+            if (results.length === 0) {
+                searchContainer.innerHTML = '<p>No results found.</p>';
+                return;
+            }
+            
+            results.forEach(result => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'search-result';
+                resultItem.innerHTML = `
+                    <h4>${result.name} (${result.type})</h4>
+                    <p>${result.description}</p>
+                `;
+                searchContainer.appendChild(resultItem);
+            });
+        }
+
+        // Add new service (admin function)
+        async function addService(serviceData) {
+            try {
+                const result = await apiCall('/stats', {
+                    method: 'POST',
+                    body: JSON.stringify(serviceData)
+                });
+                
+                alert('Service added successfully!');
+                loadStats(); // Refresh the services list
+                return result;
+            } catch (error) {
+                console.error('Error adding service:', error);
+                alert('Failed to add service. Please try again.');
+                throw error;
+            }
+        }
+
+        // Initialize database (run once)
+        async function initializeDatabase() {
+            try {
+                const result = await apiCall('/init-db', { method: 'POST' });
+                alert('Database initialized successfully!');
+                return result;
+            } catch (error) {
+                console.error('Error initializing database:', error);
+                alert('Failed to initialize database.');
+                throw error;
+            }
+        }
+
+        // Error display function
+        function displayError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.style.cssText = `
+                background: #ff6b6b;
+                color: white;
+                padding: 15px;
+                border-radius: 8px;
+                margin: 20px 0;
+                text-align: center;
+            `;
+            errorDiv.textContent = message;
+            
+            // Insert at the top of the current page
+            const currentPage = document.querySelector('.page.active');
+            if (currentPage) {
+                currentPage.insertBefore(errorDiv, currentPage.firstChild);
+                
+                // Remove error message after 5 seconds
+                setTimeout(() => {
+                    errorDiv.remove();
+                }, 5000);
+            }
+        }
+
+        // Enhanced form submission handler
+        function handleDatabaseFormSubmit(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData);
+            
+            // Submit to database instead of just showing alert
+            submitContactForm(data);
+        }
+
+        // Select service function (for service cards)
+        function selectService(serviceName) {
+            // Pre-fill the contact form with selected service
+            showPage('contact');
+            setTimeout(() => {
+                const serviceSelect = document.getElementById('service');
+                if (serviceSelect) {
+                    // Find matching option
+                    for (let option of serviceSelect.options) {
+                        if (option.text.toLowerCase().includes(serviceName.toLowerCase())) {
+                            option.selected = true;
+                            break;
+                        }
+                    }
+                }
+            }, 100);
+        }
+
+        // Page-specific data loading
+        function loadPageData(pageId) {
+            switch(pageId) {
+                case 'Players':
+                    loadStats();
+                    break;
+                case 'Stats':
+                    loadProjects();
+                    break;
+                default:
+                    // No specific data loading needed
+                    break;
+            }
+        }
+
+        // Enhanced page navigation with data loading
+        function showPageWithData(pageId) {
+            showPage(pageId); // Your existing function
+            loadPageData(pageId);
+        }
+
+        // Auto-load data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing database connections...');
+            
+            // Load initial data for the home page
+            loadStats();
+            loadProjects();
+            
+            // Override form submission
+            const contactForm = document.querySelector('#contact form');
+            if (contactForm) {
+                contactForm.addEventListener('submit', handleDatabaseFormSubmit);
+            }
+            
+            // Add search functionality if search input exists
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const query = e.target.value;
+                    if (query.length > 2) { // Start searching after 3 characters
+                        searchContent(query);
+                    }
+                });
+            }
+        });
+
+        // Example usage functions for testing
+        function testDatabaseConnection() {
+            console.log('Testing database connection...');
+            loadStats();
+        }
+
+        function addTestService() {
+            const testService = {
+                title: 'Test Service',
+                description: 'This is a test service added via JavaScript',
+                price: 99.99,
+                image_url: 'https://via.placeholder.com/300x200'
+            };
+            addService(testService);
+        }
+
     </script>
 </body>
 </html>
+
