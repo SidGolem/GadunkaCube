@@ -12,9 +12,9 @@ CORS(app)  # Enable CORS for frontend-backend communication
 # Database configuration
 DB_CONFIG = {
     'host': 'localhost',
-    'database': 'your_website_db',
-    'user': 'your_username',
-    'password': 'your_password'
+    'database': 'cubandb',
+    'user': 'wheil10',
+    'password': 'Cruc1f0rmK3y/'
 }
 
 # Database connection function
@@ -25,7 +25,6 @@ def get_db_connection():
     except Error as e:
         print(f"Error: {e}")
         return None
-
 
 # API Routes
 @app.route('/')
@@ -74,8 +73,8 @@ def get_services():
     except Error as e:
         return jsonify({'error': str(e)}), 500
 
-# Get all portfolio projects
-@app.route('/api/projects', methods=['GET'])
+# Get all players
+@app.route('/api/players', methods=['GET'])
 def get_projects():
     connection = get_db_connection()
     if not connection:
@@ -83,7 +82,7 @@ def get_projects():
     
     try:
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM projects ORDER BY created_at DESC")
+        cursor.execute("SELECT * FROM player ORDER BY created_at DESC")
         projects = cursor.fetchall()
         cursor.close()
         connection.close()
@@ -214,14 +213,6 @@ def search():
     except Error as e:
         return jsonify({'error': str(e)}), 500
 
-# Initialize database tables
-@app.route('/init-db', methods=['POST'])
-def init_database():
-    try:
-        create_tables()
-        return jsonify({'message': 'Database initialized successfully'}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     print("Starting Flask server...")
@@ -232,6 +223,6 @@ if __name__ == '__main__':
     print("- POST /api/contact - Submit contact form")
     print("- GET /api/messages - Get contact messages")
     print("- GET /api/search?q=query - Search content")
-    print("- POST /init-db - Initialize database tables")
-    
+    print("attempting database connection")
+    get_db_connection()
     app.run(debug=True, host='0.0.0.0', port=5000)
