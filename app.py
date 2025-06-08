@@ -30,42 +30,18 @@ def get_db_connection():
 @app.route('/')
 def home():
     # Serve your HTML file (you can also use render_template with separate HTML file)
-    return render_template_string("""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Database Connected Website</title>
-        <script>
-            // This would be your frontend JavaScript
-            async function loadServices() {
-                try {
-                    const response = await fetch('/api/services');
-                    const services = await response.json();
-                    console.log('Services:', services);
-                    // Update your HTML with this data
-                } catch (error) {
-                    console.error('Error loading services:', error);
-                }
-            }
-        </script>
-    </head>
-    <body>
-        <h1>Your Website</h1>
-        <p>This backend is serving your frontend and database!</p>
-    </body>
-    </html>
-    """)
+    return render_template_string('gadunka.html')
 
-# Get all services
-@app.route('/api/services', methods=['GET'])
-def get_services():
+# Get all card stats
+@app.route('/api/cardstats', methods=['GET'])
+def get_cardstats():
     connection = get_db_connection()
     if not connection:
         return jsonify({'error': 'Database connection failed'}), 500
     
     try:
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM services ORDER BY created_at DESC")
+        cursor.execute("SELECT * FROM card ORDER BY card_name DESC")
         services = cursor.fetchall()
         cursor.close()
         connection.close()
@@ -75,14 +51,14 @@ def get_services():
 
 # Get all players
 @app.route('/api/players', methods=['GET'])
-def get_projects():
+def get_players():
     connection = get_db_connection()
     if not connection:
         return jsonify({'error': 'Database connection failed'}), 500
     
     try:
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM player ORDER BY created_at DESC")
+        cursor.execute("SELECT * FROM player ORDER BY username DESC")
         projects = cursor.fetchall()
         cursor.close()
         connection.close()
@@ -90,12 +66,12 @@ def get_projects():
     except Error as e:
         return jsonify({'error': str(e)}), 500
 
-# Add a new service
-@app.route('/api/services', methods=['POST'])
+# Add a new cardstat
+@app.route('/api/cardstats', methods=['POST'])
 def add_service():
     data = request.get_json()
     
-    if not data or not all(key in data for key in ['title', 'description', 'price']):
+    if not data or not all(key in data for key in ['card_name', 'tags', 'color_cat']):
         return jsonify({'error': 'Missing required fields'}), 400
     
     connection = get_db_connection()
@@ -105,14 +81,16 @@ def add_service():
     try:
         cursor = connection.cursor()
         query = """
-            INSERT INTO services (title, description, price, image_url)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO card (card_name, colors, cmc, card_type, tags, color_cat)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """
         values = (
-            data['title'],
-            data['description'],
-            data['price'],
-            data.get('image_url', '')
+            data['card_name'],
+            data['colors'],
+            data['cmc'],
+            data['card_type'],
+            data['tags'],
+            data['color_cat']
         )
         cursor.execute(query, values)
         connection.commit()
@@ -121,62 +99,62 @@ def add_service():
         cursor.close()
         connection.close()
         
-        return jsonify({'message': 'Service added successfully', 'id': service_id}), 201
+        return jsonify({'message': 'Card added successfully', 'id': service_id}), 201
     except Error as e:
         return jsonify({'error': str(e)}), 500
 
-# Submit contact form
-@app.route('/api/contact', methods=['POST'])
-def submit_contact():
-    data = request.get_json()
+# # Submit update form
+# @app.route('/api/update', methods=['POST'])
+# def submit_update():
+#     data = request.get_json()
     
-    required_fields = ['name', 'email', 'message']
-    if not data or not all(key in data for key in required_fields):
-        return jsonify({'error': 'Missing required fields'}), 400
+#     required_fields = ['name', 'email', 'message']
+#     if not data or not all(key in data for key in required_fields):
+#         return jsonify({'error': 'Missing required fields'}), 400
     
-    connection = get_db_connection()
-    if not connection:
-        return jsonify({'error': 'Database connection failed'}), 500
+#     connection = get_db_connection()
+#     if not connection:
+#         return jsonify({'error': 'Database connection failed'}), 500
     
-    try:
-        cursor = connection.cursor()
-        query = """
-            INSERT INTO contact_messages (name, email, service, message)
-            VALUES (%s, %s, %s, %s)
-        """
-        values = (
-            data['name'],
-            data['email'],
-            data.get('service', ''),
-            data['message']
-        )
-        cursor.execute(query, values)
-        connection.commit()
+#     try:
+#         cursor = connection.cursor()
+#         query = """
+#             INSERT INTO contact_messages (name, email, service, message)
+#             VALUES (%s, %s, %s, %s)
+#         """
+#         values = (
+#             data['name'],
+#             data['email'],
+#             data.get('service', ''),
+#             data['message']
+#         )
+#         cursor.execute(query, values)
+#         connection.commit()
         
-        message_id = cursor.lastrowid
-        cursor.close()
-        connection.close()
+#         message_id = cursor.lastrowid
+#         cursor.close()
+#         connection.close()
         
-        return jsonify({'message': 'Contact form submitted successfully', 'id': message_id}), 201
-    except Error as e:
-        return jsonify({'error': str(e)}), 500
+#         return jsonify({'message': 'Contact form submitted successfully', 'id': message_id}), 201
+#     except Error as e:
+#         return jsonify({'error': str(e)}), 500
 
-# Get contact messages (admin only)
-@app.route('/api/messages', methods=['GET'])
-def get_messages():
-    connection = get_db_connection()
-    if not connection:
-        return jsonify({'error': 'Database connection failed'}), 500
+# # Get contact messages (admin only)
+# @app.route('/api/messages', methods=['GET'])
+# def get_messages():
+#     connection = get_db_connection()
+#     if not connection:
+#         return jsonify({'error': 'Database connection failed'}), 500
     
-    try:
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM contact_messages ORDER BY created_at DESC")
-        messages = cursor.fetchall()
-        cursor.close()
-        connection.close()
-        return jsonify(messages)
-    except Error as e:
-        return jsonify({'error': str(e)}), 500
+#     try:
+#         cursor = connection.cursor(dictionary=True)
+#         cursor.execute("SELECT * FROM contact_messages ORDER BY created_at DESC")
+#         messages = cursor.fetchall()
+#         cursor.close()
+#         connection.close()
+#         return jsonify(messages)
+#     except Error as e:
+#         return jsonify({'error': str(e)}), 500
 
 # Search functionality
 @app.route('/api/search', methods=['GET'])
@@ -196,13 +174,9 @@ def search():
         search_query = f"%{query}%"
         
         cursor.execute("""
-            SELECT 'service' as type, id, title as name, description 
-            FROM services 
-            WHERE title LIKE %s OR description LIKE %s
-            UNION
-            SELECT 'project' as type, id, name, description 
-            FROM projects 
-            WHERE name LIKE %s OR description LIKE %s OR technology LIKE %s
+            SELECT 'card' as card_name, color_cat, tags as card_name, tags 
+            FROM card
+            WHERE card_name LIKE %s OR tags LIKE %s
         """, (search_query, search_query, search_query, search_query, search_query))
         
         results = cursor.fetchall()

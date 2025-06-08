@@ -26,7 +26,7 @@
                     loadPlayers();
                     break;
                 case 'Stats':
-                    loadStats();
+                    loadCardStats();
                     break;
                 default:
                     // No specific data loading needed
@@ -44,7 +44,7 @@
         document.querySelectorAll('.nav-btn').forEach(button => {
             button.addEventListener('click', function() {
                 const pageId = this.getAttribute('data-page');
-                showPage(pageId);
+                showPageWithData(pageId);
             });
         });
 
@@ -72,7 +72,7 @@
         // frontend-db.js
 
         // Configuration
-        const API_BASE_URL = 'http://localhost:8000/api';
+        const API_BASE_URL = 'http://localhost:5000/api';
 
         // Utility function to make API calls
         async function apiCall(endpoint, options = {}) {
@@ -99,8 +99,8 @@
         // Load card stats from database and display them
         async function loadCardStats() {
             try {
-                const services = await apiCall('/cardstats');
-                displayStats(services);
+                const cardstats = await apiCall('/cardstats');
+                displayCardStats(cardstats);
             } catch (error) {
                 console.error('Error loading stats:', error);
                 displayError('Failed to load stats. Please try again later.');
@@ -108,25 +108,25 @@
         }
 
         // 111111111111 Display all cards in the UI 1111111111111111111
-        function displayCardStats(services) {
-            const servicesContainer = document.getElementById('services-container');
-            if (!servicesContainer) return;
+        function displayCardStats(cardstats) {
+            const cardstatsContainer = document.getElementById('cardstats-container');
+            if (!cardstatsContainer) return;
             
-            servicesContainer.innerHTML = '';
+            cardstatsContainer.innerHTML = '';
             
-            services.forEach(service => {
-                const serviceCard = document.createElement('div');
-                serviceCard.className = 'card';
-                serviceCard.innerHTML = `
-                    <h3>${service.title}</h3>
-                    <p>${service.description}</p>
-                    <p class="price">$${service.price}</p>
-                    ${service.image_url ? `<img src="${service.image_url}" alt="${service.title}" style="max-width: 100%; border-radius: 8px;">` : ''}
+            cardstats.forEach(cardstat => {
+                const cardstatCard = document.createElement('div');
+                cardstatCard.className = 'card';
+                cardstatCard.innerHTML = `
+                    <h3>${cardstat.card_name}</h3>
+                    <p>${cardstat.color_cat}</p>
+                    <p class="color_cat">$${cardstat.tags}</p>
+                    ${cardstat.image_url ? `<img src="${cardstat.image_url}" alt="${cardstat.card_name}" style="max-width: 100%; border-radius: 8px;">` : ''}
                     <div style="margin-top: 15px;">
-                        <button class="action-btn" onclick="selectService('${service.title}')">Select Service</button>
+                        <button class="action-btn" onclick="selectcardstat('${cardstat.card_name}')">Select cardstat</button>
                     </div>
                 `;
-                servicesContainer.appendChild(serviceCard);
+                cardstatsContainer.appendChild(cardstatCard);
             });
         }
 
@@ -143,7 +143,7 @@
 
         // Display players in the UI
         function displayPlayers(players) {
-            const playerscontainer = document.getElementById('players-container');
+            const playersContainer = document.getElementById('players-container');
             if (!playersContainer) return;
             
             playersContainer.innerHTML = '';
@@ -153,12 +153,12 @@
                 playerCard.className = 'card';
                 playerCard.innerHTML = `
                     <h3>${player.username}</h3>
-                    <p>${player.description}</p>
-                    <p><strong>Technology:</strong> ${project.technology}</p>
-                    ${project.image_url ? `<img src="${project.image_url}" alt="${project.name}" style="max-width: 100%; border-radius: 8px; margin: 10px 0;">` : ''}
-                    ${project.project_url ? `<a href="${project.project_url}" target="_blank" class="action-btn" style="display: inline-block; text-decoration: none; margin-top: 10px;">View Project</a>` : ''}
+                    <p>${player.tags}</p>
+                    <p><strong>Technology:</strong> ${player.technology}</p>
+                    ${player.image_url ? `<img src="${player.image_url}" alt="${player.name}" style="max-width: 100%; border-radius: 8px; margin: 10px 0;">` : ''}
+                    ${player.player_url ? `<a href="${player.player_url}" target="_blank" class="action-btn" style="display: inline-block; text-decoration: none; margin-top: 10px;">View player</a>` : ''}
                 `;
-                projectsContainer.appendChild(projectCard);
+                playersContainer.appendChild(playerCard);
             });
         }
 
@@ -210,26 +210,26 @@
                 resultItem.className = 'search-result';
                 resultItem.innerHTML = `
                     <h4>${result.name} (${result.type})</h4>
-                    <p>${result.description}</p>
+                    <p>${result.tags}</p>
                 `;
                 searchContainer.appendChild(resultItem);
             });
         }
 
         // Add new stats (admin function)
-        async function addStats(serviceData) {
+        async function addStats(cardstatData) {
             try {
                 const result = await apiCall('/stats', {
                     method: 'POST',
-                    body: JSON.stringify(serviceData)
+                    body: JSON.stringify(cardstatData)
                 });
                 
                 alert('Stats added successfully!');
-                loadStats(); // Refresh the services list
+                loadCardStats(); // Refresh the cardstats list
                 return result;
             } catch (error) {
-                console.error('Error adding service:', error);
-                alert('Failed to add service. Please try again.');
+                console.error('Error adding cardstat:', error);
+                alert('Failed to add cardstat. Please try again.');
                 throw error;
             }
         }
@@ -284,16 +284,16 @@
             submitContactForm(data);
         }
 
-        // Select service function (for service cards)
-        function selectService(serviceName) {
-            // Pre-fill the contact form with selected service
+        // Select cardstat function (for cardstat cards)
+        function selectcardstat(cardstatName) {
+            // Pre-fill the contact form with selected cardstat
             showPage('contact');
             setTimeout(() => {
-                const serviceSelect = document.getElementById('service');
-                if (serviceSelect) {
+                const cardstatSelect = document.getElementById('cardstat');
+                if (cardstatSelect) {
                     // Find matching option
-                    for (let option of serviceSelect.options) {
-                        if (option.text.toLowerCase().includes(serviceName.toLowerCase())) {
+                    for (let option of cardstatSelect.options) {
+                        if (option.text.toLowerCase().includes(cardstatName.toLowerCase())) {
                             option.selected = true;
                             break;
                         }
@@ -307,8 +307,8 @@
             console.log('Page loaded, initializing database connections...');
             
             // Load initial data for the home page
-            loadStats();
-            loadProjects();
+            loadCardStats();
+            loadPlayers();
             
             // Override form submission
             const contactForm = document.querySelector('#contact form');
@@ -331,17 +331,17 @@
         // Example usage functions for testing
         function testDatabaseConnection() {
             console.log('Testing database connection...');
-            loadStats();
+            loadCardStats();
         }
 
-        function addTestService() {
-            const testService = {
-                title: 'Test Service',
-                description: 'This is a test service added via JavaScript',
-                price: 99.99,
+        function addTestcardstat() {
+            const testcardstat = {
+                card_name: 'Test cardstat',
+                tags: 'This is a test cardstat added via JavaScript',
+                color_cat: 99.99,
                 image_url: 'https://via.placeholder.com/300x200'
             };
-            addService(testService);
+            addcardstat(testcardstat);
         }
 
         function followLinkById(linkId) {
