@@ -1,352 +1,351 @@
- // Page navigation functionality
-        function showPage(pageId) {
-            // Hide all pages
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-            
-            // Show selected page
-            document.getElementById(pageId).classList.add('active');
-            
-            // Update navigation buttons
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+// frontend-database.js - Fixed version
 
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+// Configuration - Updated to match Flask backend
+const API_BASE_URL = '/api'; // Changed from 'http://localhost:5000/api' to work with Flask's serve setup
 
-        // Page-specific data loading
-        function loadPageData(pageId) {
-            switch(pageId) {
-                case 'Players':
-                    loadPlayers();
-                    break;
-                case 'Stats':
-                    loadCardStats();
-                    break;
-                default:
-                    // No specific data loading needed
-                    break;
-            }
-        }
-
-         // Enhanced page navigation with data loading
-        function showPageWithData(pageId) {
-            showPage(pageId); // Your existing function
-            loadPageData(pageId);
-        }
-
-        // Navigation button event listeners
-        document.querySelectorAll('.nav-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const pageId = this.getAttribute('data-page');
-                showPageWithData(pageId);
-            });
+// Utility function to make API calls
+async function apiCall(endpoint, options = {}) {
+    try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            },
+            ...options
         });
-
-        // Form handling
-        function handleFormSubmit(event) {
-            event.preventDefault();
-            
-            const formData = new FormData(event.target);
-            const data = Object.fromEntries(formData);
-            
-            alert(`Thank you ${data.name}! Your message has been sent. We'll get back to you soon!`);
-            
-            // In a real application, you would send this data to your server
-            console.log('Form data:', data);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('API call failed:', error);
+        throw error;
+    }
+}
 
-        function resetForm() {
-            document.querySelector('form').reset();
+// Page navigation functionality
+function showPage(pageId) {
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+    });
+    
+    // Show selected page
+    document.getElementById(pageId).classList.add('active');
+    
+    // Update navigation buttons
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    const targetBtn = document.querySelector(`[data-page="${pageId}"]`);
+    if (targetBtn) {
+        targetBtn.classList.add('active');
+    }
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Page-specific data loading
+function loadPageData(pageId) {
+    switch(pageId) {
+        case 'Players':
+            loadPlayers();
+            break;
+        case 'Stats':
+            loadCardStats();
+            break;
+        default:
+            // No specific data loading needed
+            break;
+    }
+}
+
+// Enhanced page navigation with data loading
+function showPageWithData(pageId) {
+    showPage(pageId);
+    loadPageData(pageId);
+}
+
+// Load card stats from database and display them - Fixed to match backend API
+async function loadCardStats() {
+    try {
+        const cards = await apiCall('/cardstats'); // Changed from '/cardstats' to match Flask route
+        displayCardStats(cards);
+    } catch (error) {
+        console.error('Error loading card stats:', error);
+        displayError('Failed to load card stats. Please try again later.');
+    }
+}
+
+// Display all cards in the UI - Fixed to match actual card data structure
+function displayCardStats(cards) {
+    const cardsContainer = document.getElementById('cards-container'); // Fixed ID to match HTML
+    if (!cardsContainer) {
+        console.error('Cards container not found');
+        return;
+    }
+    
+    if (cards.length === 0) {
+        cardsContainer.innerHTML = '<div class="card"><h3>No cards found</h3><p>Add some cards to get started!</p></div>';
+        return;
+    }
+    
+    cardsContainer.innerHTML = cards.map(card => `
+        <div class="card">
+            <h3>${card.card_name}</h3>
+            <p><strong>Colors:</strong> ${card.colors || 'None'}</p>
+            <p><strong>CMC:</strong> ${card.cmc || 0}</p>
+            <p><strong>Type:</strong> ${card.card_type || 'Unknown'}</p>
+            <p><strong>Tags:</strong> ${card.tags || 'None'}</p>
+            <p><strong>Category:</strong> ${card.color_cat || 'Unknown'}</p>
+        </div>
+    `).join('');
+}
+
+// Load all players from database - Fixed to match backend structure
+async function loadPlayers() {
+    try {
+        const players = await apiCall('/players');
+        displayPlayers(players);
+    } catch (error) {
+        console.error('Error loading players:', error);
+        displayError('Failed to load players. Please try again later.');
+    }
+}
+
+// Display players in the UI - Fixed to match actual player data structure
+function displayPlayers(players) {
+    const playersContainer = document.getElementById('players-container'); // Matches HTML ID
+    if (!playersContainer) {
+        console.error('Players container not found');
+        return;
+    }
+    
+    if (players.length === 0) {
+        playersContainer.innerHTML = '<div class="card"><h3>No players found</h3><p>Add some players to get started!</p></div>';
+        return;
+    }
+    
+    playersContainer.innerHTML = players.map(player => `
+        <div class="card">
+            <h3>${player.username}</h3>
+            <ul style="text-align: left; list-style: none; padding: 0;">
+                <li><strong>Wins:</strong> ${player.wins || 0}</li>
+                <li><strong>Favorite Color:</strong> ${player.favorite_color || 'Not set'}</li>
+                <li><strong>Most Used Combo:</strong> ${player.most_used_combo || 'None recorded'}</li>
+            </ul>
+        </div>
+    `).join('');
+}
+
+// Search functionality - Fixed to work with backend search endpoint
+async function searchContent(query) {
+    if (!query.trim()) {
+        document.getElementById('search-results').innerHTML = '';
+        return;
+    }
+    
+    try {
+        const results = await apiCall(`/search?q=${encodeURIComponent(query)}`);
+        displaySearchResults(results);
+    } catch (error) {
+        console.error('Error searching:', error);
+        displayError('Search failed. Please try again.');
+    }
+}
+
+// Display search results - Fixed to match backend search response
+function displaySearchResults(results) {
+    const searchContainer = document.getElementById('search-results');
+    if (!searchContainer) return;
+    
+    if (results.length === 0) {
+        searchContainer.innerHTML = '<div class="search-result-item">No results found.</div>';
+        return;
+    }
+    
+    searchContainer.innerHTML = results.map(result => `
+        <div class="search-result-item">
+            <strong>${result.card_name}</strong><br>
+            <small>Category: ${result.color_cat} | Tags: ${result.tags}</small>
+        </div>
+    `).join('');
+}
+
+// Add new card - Fixed to match backend card creation endpoint
+async function addCard(cardData) {
+    try {
+        const result = await apiCall('/cardstats', {
+            method: 'POST',
+            body: JSON.stringify(cardData)
+        });
+        
+        alert('Card added successfully!');
+        
+        // Refresh the cards list if we're on the stats page
+        if (document.getElementById('Stats').classList.contains('active')) {
+            loadCardStats();
         }
+        
+        return result;
+    } catch (error) {
+        console.error('Error adding card:', error);
+        alert('Failed to add card. Please try again.');
+        throw error;
+    }
+}
 
-        // Initialize page
-        console.log('Multi-page website loaded successfully!');
-        console.log('Use Alt+1-5 for keyboard navigation');
+// Add new player - Fixed to match backend player creation endpoint
+async function addPlayer(playerData) {
+    try {
+        const result = await apiCall('/players', {
+            method: 'POST',
+            body: JSON.stringify(playerData)
+        });
+        
+        alert('Player added successfully!');
+        
+        // Refresh the players list if we're on the players page
+        if (document.getElementById('Players').classList.contains('active')) {
+            loadPlayers();
+        }
+        
+        return result;
+    } catch (error) {
+        console.error('Error adding player:', error);
+        alert('Failed to add player. Please try again.');
+        throw error;
+    }
+}
 
-        // frontend-db.js
-
-        // Configuration
-        const API_BASE_URL = 'http://localhost:5000/api';
-
-        // Utility function to make API calls
-        async function apiCall(endpoint, options = {}) {
-            try {
-                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...options.headers
-                    },
-                    ...options
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                return await response.json();
-            } catch (error) {
-                console.error('API call failed:', error);
-                throw error;
+// Error display function
+function displayError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.style.cssText = `
+        background: #e74c3c;
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        text-align: center;
+        position: relative;
+        z-index: 1000;
+    `;
+    errorDiv.textContent = message;
+    
+    // Insert at the top of the current page
+    const currentPage = document.querySelector('.page.active');
+    if (currentPage) {
+        currentPage.insertBefore(errorDiv, currentPage.firstChild);
+        
+        // Remove error message after 5 seconds
+        setTimeout(() => {
+            if (errorDiv.parentNode) {
+                errorDiv.remove();
             }
-        }
+        }, 5000);
+    }
+}
 
-        // Load card stats from database and display them
-        async function loadCardStats() {
-            try {
-                const cardstats = await apiCall('/cardstats');
-                displayCardStats(cardstats);
-            } catch (error) {
-                console.error('Error loading stats:', error);
-                displayError('Failed to load stats. Please try again later.');
-            }
-        }
+// Enhanced form submission handler for data entry
+async function handleFormSubmit(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData.entries());
+    
+    try {
+        await addCard(data);
+        event.target.reset(); // Clear form on success
+    } catch (error) {
+        console.error('Form submission error:', error);
+    }
+}
 
-        // 111111111111 Display all cards in the UI 1111111111111111111
-        function displayCardStats(cardstats) {
-            const cardstatsContainer = document.getElementById('cardstats-container');
-            if (!cardstatsContainer) return;
+// Initialize search functionality
+function initializeSearch() {
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        let searchTimeout;
+        
+        searchInput.addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            const query = e.target.value.trim();
             
-            cardstatsContainer.innerHTML = '';
-            
-            cardstats.forEach(cardstat => {
-                const cardstatCard = document.createElement('div');
-                cardstatCard.className = 'card';
-                cardstatCard.innerHTML = `
-                    <h3>${cardstat.card_name}</h3>
-                    <p>${cardstat.color_cat}</p>
-                    <p class="color_cat">$${cardstat.tags}</p>
-                    ${cardstat.image_url ? `<img src="${cardstat.image_url}" alt="${cardstat.card_name}" style="max-width: 100%; border-radius: 8px;">` : ''}
-                    <div style="margin-top: 15px;">
-                        <button class="action-btn" onclick="selectcardstat('${cardstat.card_name}')">Select cardstat</button>
-                    </div>
-                `;
-                cardstatsContainer.appendChild(cardstatCard);
-            });
-        }
-
-        // Load all players from database
-        async function loadPlayers() {
-            try {
-                const players = await apiCall('/players');
-                displayPlayers(players);
-            } catch (error) {
-                console.error('Error loading players:', error);
-                displayError('Failed to load players. Please try again later.');
-            }
-        }
-
-        // Display players in the UI
-        function displayPlayers(players) {
-            const playersContainer = document.getElementById('players-container');
-            if (!playersContainer) return;
-            
-            playersContainer.innerHTML = '';
-            
-            players.forEach(player => {
-                const playerCard = document.createElement('div');
-                playerCard.className = 'card';
-                playerCard.innerHTML = `
-                    <h3>${player.username}</h3>
-                    <p>${player.tags}</p>
-                    <p><strong>Technology:</strong> ${player.technology}</p>
-                    ${player.image_url ? `<img src="${player.image_url}" alt="${player.name}" style="max-width: 100%; border-radius: 8px; margin: 10px 0;">` : ''}
-                    ${player.player_url ? `<a href="${player.player_url}" target="_blank" class="action-btn" style="display: inline-block; text-decoration: none; margin-top: 10px;">View player</a>` : ''}
-                `;
-                playersContainer.appendChild(playerCard);
-            });
-        }
-
-        // Submit contact form to database
-        async function submitContactForm(formData) {
-            try {
-                const result = await apiCall('/contact', {
-                    method: 'POST',
-                    body: JSON.stringify(formData)
-                });
-                
-                alert('Thank you for your message! We\'ll get back to you soon.');
-                document.querySelector('#contact form').reset();
-                return result;
-            } catch (error) {
-                console.error('Error submitting contact form:', error);
-                alert('Failed to send message. Please try again later.');
-                throw error;
-            }
-        }
-
-        // Search functionality
-        async function searchContent(query) {
-            if (!query.trim()) return;
-            
-            try {
-                const results = await apiCall(`/search?q=${encodeURIComponent(query)}`);
-                displaySearchResults(results);
-            } catch (error) {
-                console.error('Error searching:', error);
-                displayError('Search failed. Please try again.');
-            }
-        }
-
-        // Display search results
-        function displaySearchResults(results) {
-            const searchContainer = document.getElementById('search-results');
-            if (!searchContainer) return;
-            
-            searchContainer.innerHTML = '';
-            
-            if (results.length === 0) {
-                searchContainer.innerHTML = '<p>No results found.</p>';
+            if (query.length === 0) {
+                document.getElementById('search-results').innerHTML = '';
                 return;
             }
             
-            results.forEach(result => {
-                const resultItem = document.createElement('div');
-                resultItem.className = 'search-result';
-                resultItem.innerHTML = `
-                    <h4>${result.name} (${result.type})</h4>
-                    <p>${result.tags}</p>
-                `;
-                searchContainer.appendChild(resultItem);
-            });
-        }
-
-        // Add new stats (admin function)
-        async function addStats(cardstatData) {
-            try {
-                const result = await apiCall('/stats', {
-                    method: 'POST',
-                    body: JSON.stringify(cardstatData)
-                });
-                
-                alert('Stats added successfully!');
-                loadCardStats(); // Refresh the cardstats list
-                return result;
-            } catch (error) {
-                console.error('Error adding cardstat:', error);
-                alert('Failed to add cardstat. Please try again.');
-                throw error;
-            }
-        }
-
-        // Initialize database (run once)
-        async function initializeDatabase() {
-            try {
-                const result = await apiCall('/init-db', { method: 'POST' });
-                alert('Database initialized successfully!');
-                return result;
-            } catch (error) {
-                console.error('Error initializing database:', error);
-                alert('Failed to initialize database.');
-                throw error;
-            }
-        }
-
-        // Error display function
-        function displayError(message) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message';
-            errorDiv.style.cssText = `
-                background: #ff6b6b;
-                color: white;
-                padding: 15px;
-                border-radius: 8px;
-                margin: 20px 0;
-                text-align: center;
-            `;
-            errorDiv.textContent = message;
-            
-            // Insert at the top of the current page
-            const currentPage = document.querySelector('.page.active');
-            if (currentPage) {
-                currentPage.insertBefore(errorDiv, currentPage.firstChild);
-                
-                // Remove error message after 5 seconds
-                setTimeout(() => {
-                    errorDiv.remove();
-                }, 5000);
-            }
-        }
-
-        // Enhanced form submission handler
-        function handleDatabaseFormSubmit(event) {
-            event.preventDefault();
-            
-            const formData = new FormData(event.target);
-            const data = Object.fromEntries(formData);
-            
-            // Submit to database instead of just showing alert
-            submitContactForm(data);
-        }
-
-        // Select cardstat function (for cardstat cards)
-        function selectcardstat(cardstatName) {
-            // Pre-fill the contact form with selected cardstat
-            showPage('contact');
-            setTimeout(() => {
-                const cardstatSelect = document.getElementById('cardstat');
-                if (cardstatSelect) {
-                    // Find matching option
-                    for (let option of cardstatSelect.options) {
-                        if (option.text.toLowerCase().includes(cardstatName.toLowerCase())) {
-                            option.selected = true;
-                            break;
-                        }
-                    }
-                }
-            }, 100);
-        }
-
-        // Auto-load data when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Page loaded, initializing database connections...');
-            
-            // Load initial data for the home page
-            loadCardStats();
-            loadPlayers();
-            
-            // Override form submission
-            const contactForm = document.querySelector('#contact form');
-            if (contactForm) {
-                contactForm.addEventListener('submit', handleDatabaseFormSubmit);
-            }
-            
-            // Add search functionality if search input exists
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) {
-                searchInput.addEventListener('input', function(e) {
-                    const query = e.target.value;
-                    if (query.length > 2) { // Start searching after 3 characters
-                        searchContent(query);
-                    }
-                });
-            }
+            // Debounce search to avoid too many API calls
+            searchTimeout = setTimeout(() => {
+                searchContent(query);
+            }, 300);
         });
+    }
+}
 
-        // Example usage functions for testing
-        function testDatabaseConnection() {
-            console.log('Testing database connection...');
-            loadCardStats();
-        }
+// Navigation button event listeners - Fixed to work with existing HTML
+function initializeNavigation() {
+    document.querySelectorAll('.nav-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const pageId = this.getAttribute('data-page');
+            showPageWithData(pageId);
+        });
+    });
+}
 
-        function addTestcardstat() {
-            const testcardstat = {
-                card_name: 'Test cardstat',
-                tags: 'This is a test cardstat added via JavaScript',
-                color_cat: 99.99,
-                image_url: 'https://via.placeholder.com/300x200'
-            };
-            addcardstat(testcardstat);
-        }
+// Initialize form handling
+function initializeForms() {
+    const dataEntryForm = document.getElementById('data-entry-form');
+    if (dataEntryForm) {
+        dataEntryForm.addEventListener('submit', handleFormSubmit);
+    }
+}
 
-        function followLinkById(linkId) {
-            const link = document.getElementById(linkId); // Get the link element by its ID
-                if (link) {
-                link.click(); // Simulate a click
-            }
-        }
+// Auto-load data when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Frontend database script loaded, initializing...');
+    
+    // Initialize all components
+    initializeNavigation();
+    initializeForms();
+    initializeSearch();
+    
+    // Load initial data for home page display
+    console.log('Loading initial data...');
+    
+    // Test database connection
+    testDatabaseConnection();
+});
+
+// Test function to verify database connectivity
+function testDatabaseConnection() {
+    console.log('Testing database connection...');
+    
+    // Test loading cards
+    loadCardStats().then(() => {
+        console.log('Card stats loaded successfully');
+    }).catch(error => {
+        console.error('Failed to load card stats:', error);
+    });
+    
+    // Test loading players
+    loadPlayers().then(() => {
+        console.log('Players loaded successfully');
+    }).catch(error => {
+        console.error('Failed to load players:', error);
+    });
+}
+
+// Utility function for debugging
+function debugState() {
+    console.log('Current page:', document.querySelector('.page.active')?.id);
+    console.log('API Base URL:', API_BASE_URL);
+    console.log('Available pages:', Array.from(document.querySelectorAll('.page')).map(p => p.id));
+}
