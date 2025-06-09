@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gadunka Cube</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Navigation Styles */
+        nav {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #ee5a24, #ff6b6b);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            transform: scale(1.05);
+        }
+
+        /* Page Content Styles */
+        .page {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-align: center;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page h2 {
+            color: #34495e;
+            margin: 25px 0 15px 0;
+            font-size: 1.8em;
+        }
+
+        .page p {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        /* Action Buttons within Pages */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 30px 0;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(45deg, #2980b9, #3498db);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .action-btn.secondary {
+            background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+        }
+
+        .action-btn.secondary:hover {
+            background: linear-gradient(45deg, #7f8c8d, #95a5a6);
+        }
+
+        .action-btn.success {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+        }
+
+        .action-btn.danger {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.2);
+        }
+
+        /* Cards */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        /* Search Styles */
+        .search-container {
+            margin: 20px 0;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        #search-results {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .search-result-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .error {
+            color: #e74c3c;
+            background: #ffeaea;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-btn {
+                width: 200px;
+            }
+            
+            .page {
+                padding: 20px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav>
+            <div class="nav-buttons">
+                <button class="nav-btn active" data-page="Home">Home</button>
+                <button class="nav-btn" data-page="Players">Players</button>
+                <button class="nav-btn" data-page="Stats">Stats</button>
+                <button class="nav-btn" data-page="Enter Data">Enter Data</button>
+            </div>
+        </nav>
+
+        <!-- Home Page -->
+        <div class="page active" id="Home">
+            <h1>Gadunka Cube Headquarters</h1>
+            
+            <div class="action-buttons">
+                <button class="action-btn" onclick="window.open('https://cubecobra.com/cube/list/22csi', '_blank')">Gadunka Cube List</button>
+                <button class="action-btn" onclick="window.open('https://cubecobra.com/cube/list/4de317bd-9f76-4d94-b3d5-99bbeba4a489', '_blank')">Mitoran Cube List</button>
+            </div>
+
+            <div class="cards-container">
+                <div class="card">
+                    <h3>Reigning Champion</h3>
+                    <p id="champion-name">Loading...</p>
+                </div>
+                <div class="card">
+                    <h3>Winning Deck</h3>
+                    <p id="winning-deck">Loading deck stats...</p>
+                    <div style="margin-top: 15px;">
+                        <button class="action-btn" onclick="viewWinningDeck()">View List</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Players Page -->
+        <div class="page" id="Players">
+            <h1>Players</h1>
+
+            <div id="players-container" class="cards-container">
+                <div class="loading">Loading players...</div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-btn" onclick="showPage('Stats')">Search Stats Database</button>
+                <button class="action-btn secondary" onclick="showPage('Home')">Back to Home</button>
+            </div>
+        </div>
+
+        <!-- Stats Page -->
+        <div class="page" id="Stats">
+            <h1>Cube Stats</h1>
+            
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search cards, tags, or colors...">
+                <div id="search-results"></div>
+            </div>
+            
+            <div id="cards-container" class="cards-container">
+                <div class="loading">Loading cards...</div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn success" onclick="showPage('Enter Data')">Add Data</button>
+                <button class="action-btn secondary" onclick="showPage('Home')">Back to Home</button>
+            </div>
+        </div>
+
+        <!-- Data Entry Page -->
+        <div class="page" id="Enter Data">
+            <h1>Enter Game Results</h1>
+            <!-- Add this section after the existing card entry form -->
+            <div style="margin-top: 40px; border-top: 2px solid #ddd; padding-top: 40px;">
+                <h2>Upload Deck List</h2>
+                
+                <form id="deck-upload-form">
+                    <div class="form-group">
+                        <label for="deck-name">Deck Name</label>
+                        <input type="text" id="deck-name" name="deck_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="player-name">Player Name</label>
+                        <input type="text" id="player-name" name="player_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deck-colors">Deck Colors</label>
+                        <input type="text" id="deck-colors" name="colors" placeholder="e.g., WU, Mono-R, 5-Color">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="archetype">Archetype</label>
+                        <input type="text" id="archetype" name="archetype" placeholder="e.g., Aggro, Control, Midrange">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="win-rate">Win Rate (%)</label>
+                        <input type="number" id="win-rate" name="win_rate" min="0" max="100" step="0.1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deck-list">Deck List</label>
+                        <textarea id="deck-list" name="deck_list" rows="10" required 
+                            placeholder="Enter one card per line, format: 'Quantity Card Name' or just 'Card Name'
+            Example:
+            2 Lightning Bolt
+            1 Counterspell
+            Serra Angel"></textarea>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="submit" class="action-btn success">Upload Deck</button>
+                        <button type="button" class="action-btn secondary" onclick="resetDeckForm()">Clear Deck Form</button>
+                    </div>
+                </form>
+            </div>
+            <form id="data-entry-form">
+                <div class="form-group">
+                    <label for="card-name">Card Name</label>
+                    <input type="text" id="card-name" name="card_name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="colors">Colors</label>
+                    <input type="text" id="colors" name="colors" placeholder="e.g., WU, R, WUBRG">
+                </div>
+
+                <div class="form-group">
+                    <label for="cmc">Converted Mana Cost</label>
+                    <input type="number" id="cmc" name="cmc" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="card-type">Card Type</label>
+                    <input type="text" id="card-type" name="card_type" placeholder="e.g., Creature, Instant, Artifact">
+                </div>
+
+                <div class="form-group">
+                    <label for="tags">Tags</label>
+                    <input type="text" id="tags" name="tags" required placeholder="e.g., removal, draw, ramp">
+                </div>
+
+                <div class="form-group">
+                    <label for="color-cat">Color Category</label>
+                    <select id="color-cat" name="color_cat" required>
+                        <option value="">Select Color Category</option>
+                        <option value="White">White</option>
+                        <option value="Blue">Blue</option>
+                        <option value="Black">Black</option>
+                        <option value="Red">Red</option>
+                        <option value="Green">Green</option>
+                        <option value="Multicolor">Multicolor</option>
+                        <option value="Colorless">Colorless</option>
+                    </select>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="submit" class="action-btn success">Add Card</button>
+                    <button type="button" class="action-btn secondary" onclick="resetForm()">Clear Form</button>
+                    <button type="button" class="action-btn secondary" onclick="showPage('Home')">Back to Home</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let playersData = [];
+        let cardsData = [];
+
+        // Navigation functionality
+        function showPage(pageName) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageName).classList.add('active');
+            
+            // Update navigation buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-page="${pageName}"]`).classList.add('active');
+            
+            // Load data when switching to specific pages
+            if (pageName === 'Players') {
+                loadPlayers();
+            } else if (pageName === 'Stats') {
+                loadCards();
+            }
+        }
+
+        // Event listeners for navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                showPage(btn.getAttribute('data-page'));
+            });
+        });
+
+        // API functions
+        async function loadPlayers() {
+            try {
+                const response = await fetch('/api/players');
+                if (!response.ok) throw new Error('Failed to load players');
+                
+                playersData = await response.json();
+                displayPlayers(playersData);
+            } catch (error) {
+                console.error('Error loading players:', error);
+                document.getElementById('players-container').innerHTML = 
+                    '<div class="error">Failed to load players. Please try again.</div>';
+            }
+        }
+
+        async function loadCards() {
+            try {
+                const response = await fetch('/api/cardstats');
+                if (!response.ok) throw new Error('Failed to load cards');
+                
+                cardsData = await response.json();
+                displayCards(cardsData);
+            } catch (error) {
+                console.error('Error loading cards:', error);
+                document.getElementById('cards-container').innerHTML = 
+                    '<div class="error">Failed to load cards. Please try again.</div>';
+            }
+        }
+
+        function displayPlayers(players) {
+            const container = document.getElementById('players-container');
+            
+            if (players.length === 0) {
+                container.innerHTML = '<div class="card"><h3>No players found</h3><p>Add some players to get started!</p></div>';
+                return;
+            }
+            
+            container.innerHTML = players.map(player => `
+                <div class="card">
+                    <h3>${player.username}</h3>
+                    <ul style="text-align: left; list-style: none; padding: 0;">
+                        <li><strong>Wins:</strong> ${player.wins || 0}</li>
+                        <li><strong>Favorite Color:</strong> ${player.favorite_color || 'Not set'}</li>
+                        <li><strong>Most Used Combo:</strong> ${player.most_used_combo || 'None recorded'}</li>
+                    </ul>
+                </div>
+            `).join('');
+        }
+
+        function displayCards(cards) {
+            const container = document.getElementById('cards-container');
+            
+            if (cards.length === 0) {
+                container.innerHTML = '<div class="card"><h3>No cards found</h3><p>Add some cards to get started!</p></div>';
+                return;
+            }
+            
+            container.innerHTML = cards.map(card => `
+                <div class="card">
+                    <h3>${card.card_name}</h3>
+                    <p><strong>Colors:</strong> ${card.colors || 'None'}</p>
+                    <p><strong>CMC:</strong> ${card.cmc || 0}</p>
+                    <p><strong>Type:</strong> ${card.card_type || 'Unknown'}</p>
+                    <p><strong>Tags:</strong> ${card.tags || 'None'}</p>
+                    <p><strong>Category:</strong> ${card.color_cat || 'Unknown'}</p>
+                </div>
+            `).join('');
+        }
+
+        // Search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const searchResults = document.getElementById('search-results');
+            let searchTimeout;
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim();
+                
+                if (query.length === 0) {
+                    searchResults.innerHTML = '';
+                    return;
+                }
+                
+                searchTimeout = setTimeout(() => performSearch(query), 300);
+            });
+        });
+
+        async function performSearch(query) {
+            const searchResults = document.getElementById('search-results');
+            searchResults.innerHTML = '<div class="loading">Searching...</div>';
+            
+            try {
+                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error('Search failed');
+                
+                const results = await response.json();
+                displaySearchResults(results);
+            } catch (error) {
+                console.error('Search error:', error);
+                searchResults.innerHTML = '<div class="error">Search failed. Please try again.</div>';
+            }
+        }
+
+        function displaySearchResults(results) {
+            const searchResults = document.getElementById('search-results');
+            
+            if (results.length === 0) {
+                searchResults.innerHTML = '<div class="search-result-item">No results found.</div>';
+                return;
+            }
+            
+            searchResults.innerHTML = results.map(result => `
+                <div class="search-result-item">
+                    <strong>${result.card_name}</strong><br>
+                    <small>Category: ${result.color_cat} | Tags: ${result.tags}</small>
+                </div>
+            `).join('');
+        }
+
+        // Form handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('data-entry-form');
+            form.addEventListener('submit', handleFormSubmit);
+        });
+
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch('/api/cardstats', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to add card');
+                }
+                
+                const result = await response.json();
+                alert('Card added successfully!');
+                resetForm();
+                
+                // Refresh cards data if we're on the stats page
+                if (document.getElementById('Stats').classList.contains('active')) {
+                    loadCards();
+                }
+            } catch (error) {
+                console.error('Error adding card:', error);
+                alert('Error adding card: ' + error.message);
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('data-entry-form').reset();
+        }
+
+        function viewWinningDeck() {
+            alert('Winning deck details would be displayed here!');
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Gadunka Cube application loaded');
+            // You can add any initialization code here
+        });
+    </script>
+</body>
+</html>

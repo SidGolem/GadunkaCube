@@ -267,6 +267,62 @@ async function handleFormSubmit(event) {
     }
 }
 
+// Add deck upload functionality
+async function uploadDeck(deckData) {
+    try {
+        const result = await apiCall('/decks', {
+            method: 'POST',
+            body: JSON.stringify(deckData)
+        });
+        
+        alert(`Deck uploaded successfully! Deck ID: ${result.deck_id}`);
+        return result;
+    } catch (error) {
+        console.error('Error uploading deck:', error);
+        alert('Failed to upload deck. Please try again.');
+        throw error;
+    }
+}
+
+// Load all decks
+async function loadDecks() {
+    try {
+        const decks = await apiCall('/decks');
+        return decks;
+    } catch (error) {
+        console.error('Error loading decks:', error);
+        throw error;
+    }
+}
+
+// Parse deck list text into card array
+function parseDeckListText(deckListText) {
+    const lines = deckListText.split('\n');
+    const cards = [];
+    
+    for (let line of lines) {
+        line = line.trim();
+        if (!line) continue;
+        
+        const match = line.match(/^(\d+)\s+(.+)$/);
+        
+        if (match) {
+            cards.push({
+                name: match[2].trim(),
+                quantity: parseInt(match[1])
+            });
+        } else {
+            cards.push({
+                name: line.trim(),
+                quantity: 1
+            });
+        }
+    }
+    
+    return cards;
+}
+
+
 // Initialize search functionality
 function initializeSearch() {
     const searchInput = document.getElementById('search-input');

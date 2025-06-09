@@ -141,6 +141,80 @@ def add_player():
     except Error as e:
         return jsonify({'error': str(e)}), 500
 
+
+
+# Add deck upload endpoint
+@app.route('/api/decks', methods=['POST'])
+def add_deck():
+    data = request.get_json()
+    
+    # Check for required fields
+    required_fields = ['deck_name', 'player_name', 'cards']
+    if not data or not all(key in data for key in required_fields):
+        return jsonify({'error': 'Missing required fields: deck_name, player_name, cards'}), 400
+    
+    connection = get_db_connection()
+    if not connection:
+        return jsonify({'error': 'Database connection failed'}), 500
+    
+    try:
+        cursor = connection.cursor()
+        
+        # Insert deck
+        deck_query = """
+            INSERT INTO deck (deck_name, player_name, colors, archetype, win_rate)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+        deck_values = (
+            data['deck_name'],
+            data['player_name'],
+            data.get('colors', ''),
+            data.get('archetype', ''),
+            data.get('win_rate', 0.0)
+        )
+        cursor.execute(deck_query, deck_values)
+        deck_id = cursor.lastrowid
+        
+        # Insert cards for this deck
+        card_query = """
+            INSERT INTO card_in_deck (deck_id, card_name, quantity)
+            VALUES (%s, %s, %s)
+        """
+        
+        for card in data['cards']:
+            card_values = (deck_id, card['name'], card.get('quantity', 1))
+            cursor.execute(card_query, card_values)
+        
+        connection.commit()
+        cursor.close()
+        connection.close()
+        
+        return jsonify({'message': 'Deck uploaded successfully', 'deck_id': deck_id}), 201
+        
+    except Error as e:
+        return jsonify({'error': str(e)}), 500
+
+# Get all decks
+@app.route('/api/decks', methods=['GET'])
+def get_decks():
+    connection = get_db_connection()
+    if not connection:
+        return jsonify({'error': 'Database connection failed'}), 500
+    
+    try:
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM deck ORDER BY deck_name ASC")
+        decks = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        return jsonify(decks)
+    except Error as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+
+
 # Search functionality
 @app.route('/api/search', methods=['GET'])
 def search():
