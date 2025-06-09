@@ -30,7 +30,7 @@ def get_db_connection():
 # API Routes
 @app.route('/')
 def home():
-    # Serve the HTML file properly
+    # Serve the HTML file from the current directory
     return render_template('gadunka.html')
 
 # Get all card stats
@@ -142,16 +142,14 @@ def add_player():
         return jsonify({'error': str(e)}), 500
 
 
-
-# Add deck upload endpoint
+# Replace the add_deck function in app.py with this corrected version:
 @app.route('/api/decks', methods=['POST'])
 def add_deck():
     data = request.get_json()
     
-    # Check for required fields
-    required_fields = ['deck_name', 'player_name', 'cards']
+    required_fields = ['player_name', 'cards']
     if not data or not all(key in data for key in required_fields):
-        return jsonify({'error': 'Missing required fields: deck_name, player_name, cards'}), 400
+        return jsonify({'error': 'Missing required fields: player_name, cards'}), 400
     
     connection = get_db_connection()
     if not connection:
@@ -160,26 +158,23 @@ def add_deck():
     try:
         cursor = connection.cursor()
         
+        # Convert username to player_id - FIX: Use correct variable name
+        player_query = "SELECT player_id FROM player WHERE username = %s"
+        cursor.execute(player_query, (data['player_name'],))
+        player_result = cursor.fetchone()
+        
+        if not player_result:
+            return jsonify({'error': f'Player {data["player_name"]} not found'}), 404
+        
+        player_id = player_result[0]
+        
         # Insert deck
-        deck_query = """
-            INSERT INTO deck (deck_name, player_name, colors, archetype, win_rate)
-            VALUES (%s, %s, %s, %s, %s)
-        """
-        deck_values = (
-            data['deck_name'],
-            data['player_name'],
-            data.get('colors', ''),
-            data.get('archetype', ''),
-            data.get('win_rate', 0.0)
-        )
-        cursor.execute(deck_query, deck_values)
+        deck_query = "INSERT INTO deck (player_player_id) VALUES (%s)"
+        cursor.execute(deck_query, (player_id,))
         deck_id = cursor.lastrowid
         
         # Insert cards for this deck
-        card_query = """
-            INSERT INTO card_in_deck (deck_id, card_name, quantity)
-            VALUES (%s, %s, %s)
-        """
+        card_query = "INSERT INTO card_in_deck (deck_id, card_name, quantity) VALUES (%s, %s, %s)"
         
         for card in data['cards']:
             card_values = (deck_id, card['name'], card.get('quantity', 1))
@@ -194,22 +189,22 @@ def add_deck():
     except Error as e:
         return jsonify({'error': str(e)}), 500
 
-# Get all decks
-@app.route('/api/decks', methods=['GET'])
-def get_decks():
-    connection = get_db_connection()
-    if not connection:
-        return jsonify({'error': 'Database connection failed'}), 500
+# # Get all decks
+# @app.route('/api/decks', methods=['GET'])
+# def get_decks():
+#     connection = get_db_connection()
+#     if not connection:
+#         return jsonify({'error': 'Database connection failed'}), 500
     
-    try:
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM deck ORDER BY deck_name ASC")
-        decks = cursor.fetchall()
-        cursor.close()
-        connection.close()
-        return jsonify(decks)
-    except Error as e:
-        return jsonify({'error': str(e)}), 500
+#     try:
+#         cursor = connection.cursor(dictionary=True)
+#         cursor.execute("SELECT * FROM deck ORDER BY deck_name ASC")
+#         decks = cursor.fetchall()
+#         cursor.close()
+#         connection.close()
+#         return jsonify(decks)
+#     except Error as e:
+#         return jsonify({'error': str(e)}), 500
 
 
 
