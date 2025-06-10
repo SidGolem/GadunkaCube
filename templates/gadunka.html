@@ -463,6 +463,11 @@
         </div>
     </div>
 
-    <script src="static/frontend-database.js"></script>
+<script src="static/api.js"></script>          <!-- 1. No dependencies -->
+<script src="static/ui-components.js"></script> <!-- 2. Uses API functions -->
+<script src="static/GameEntry.js"></script>    <!-- 3. Uses UI functions -->
+<script src="static/forms.js"></script>         <!-- 4. Uses tournament functions -->
+<script src="static/navigation.js"></script>    <!-- 5. Uses all above -->
+<script src="static/main.js"></script>          <!-- 6. Initializes everything -->
 </body>
 </html>
