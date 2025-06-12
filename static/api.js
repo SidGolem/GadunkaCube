@@ -24,7 +24,6 @@ async function apiCall(endpoint, options = {}) {
     }
 }
 
-
 // Load card stats from database and display them - Fixed to match backend API
 async function loadCardStats() {
     try {
@@ -95,6 +94,23 @@ async function addPlayer(playerData) {
     }
 }
 
+
+async function addGame(gameData) {
+    try {
+        const result = await apiCall('/game', {
+            method: 'POST',
+            body: JSON.stringify(gameData)
+        });
+        
+        alert('Game added successfully!');
+
+        return result;
+    } catch (error) {
+        console.error('Error adding game:', error);
+        alert('Failed to add game. Please try again.');
+        throw error;
+    }
+}
 
 
 // Add deck upload functionality

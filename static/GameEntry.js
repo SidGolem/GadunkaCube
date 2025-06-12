@@ -71,7 +71,20 @@ Ancestral Recall"
                     </div>
                 </div>
             `;
+            const matchDiv = document.createElement('div');
+            matchDiv.className = 'form-group';
+            matchDiv.style.cssText = 'border: 1px solid #ddd; padding: 20px; margin: 15px 0; border-radius: 10px;';
+            matchDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px;">
+                <h3>Match 1 result</h3>
+                    <label for="match-result-${i}">(Enter as "Score 1"-"Score 2", Ex: If player 1 won twice, then use "2-0") </label>
+                    <input type="text id="match-result-${i}" name="match-result-${i}">
+                </div>
+            `;
             container.appendChild(playerDiv);
+            if(i%2 == 0){
+                container.appendChild(matchDiv);
+            }
         }
         
         submitSection.style.display = 'block';

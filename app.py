@@ -33,6 +33,7 @@ def home():
     # Serve the HTML file from the current directory
     return render_template('gadunka.html')
 
+
 # Get all card stats
 @app.route('/api/cardstats', methods=['GET'])
 def get_cardstats():
@@ -66,6 +67,26 @@ def get_players():
         return jsonify(players)
     except Error as e:
         return jsonify({'error': str(e)}), 500
+
+# # Add a new game
+# @app.route('/api/game', methods=['POST'])
+# def add_game():
+#     data = request.get_json()
+
+#     #OptionaL: add check for required fields, form already does this though
+    
+#     connection = get_db_connection()
+#     if not connection:
+#         return jsonify({'error': 'Database connection failed'}), 500
+
+#     try:
+#         cursor = connection.cursor()
+#         query = ""
+#         for item in data:
+
+
+#     except Error as e:
+#         return jsonify({'error': str(e)}), 500
 
 # Add a new card
 @app.route('/api/cardstats', methods=['POST'])
